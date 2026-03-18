@@ -1052,334 +1052,330 @@
     // ===========================
     // KONFIGURASI — GANTI SESUAI KEBUTUHANMU
     // ===========================
-    const CONFIG = {
-        // Nama mempelai
-        groomName: 'Ali',
-        brideName: 'Alo',
-
-        // Tanggal pernikahan (format: YYYY-MM-DDTHH:mm:ss)
-        weddingDate: '2026-12-25T09:00:00',
-
-        // Google Apps Script Web App URLs (deploy dari Google Sheets)
-        // Lihat file SETUP.md untuk panduan lengkap
-        apiWishes: 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec',
-        apiRsvp: 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec',
-        apiGifts: 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec',
-        apiPlaylist: 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec',
-
-        // Gift items (fallback jika API belum di-setup)
-        // Kalau sudah setup Google Sheets, data diambil dari sana
+   const CONFIG = {
+    groomName: 'Ali',
+    brideName: 'Alo',
+    weddingDate: '2026-12-25T09:00:00',
+ 
+    // FIX #1: Satu base URL saja, action ditambahkan otomatis
+    apiBase: 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec',
+ 
+    // FIX #2: Default gifts sebagai fallback
+    defaultGifts: [
+        { id: 1, nama: 'Jasjus', gambar: '', harga: 'Rp. 400.000', status: 'available', diklaim_oleh: '' },
+        { id: 2, nama: 'Jus Buah', gambar: '', harga: 'Rp. 600.000', status: 'available', diklaim_oleh: '' },
+        { id: 3, nama: 'Makarel', gambar: '', harga: 'Rp. 800.000', status: 'available', diklaim_oleh: '' },
+        ]
     };
-
+    
     // ===========================
     // INIT
     // ===========================
     AOS.init({ duration: 800, once: true, offset: 60 });
     lucide.createIcons();
-
-    // Parse guest name from URL
+    
     const params = new URLSearchParams(window.location.search);
     const guestName = params.get('to');
     if (guestName) {
-        document.getElementById('guest-display').textContent = decodeURIComponent(guestName.replace(/\+/g, ' '));
-        document.getElementById('rsvp-name').value = decodeURIComponent(guestName.replace(/\+/g, ' '));
-        document.getElementById('wish-name').value = decodeURIComponent(guestName.replace(/\+/g, ' '));
-        document.getElementById('pl-name').value = decodeURIComponent(guestName.replace(/\+/g, ' '));
+        const decoded = decodeURIComponent(guestName.replace(/\+/g, ' '));
+        document.getElementById('guest-display').textContent = decoded;
+        document.getElementById('rsvp-name').value = decoded;
+        document.getElementById('wish-name').value = decoded;
+        document.getElementById('pl-name').value = decoded;
     }
-
+    
     // ===========================
     // COVER & MUSIC
     // ===========================
     let musicPlaying = false;
     const audio = document.getElementById('bg-music');
-
+    
     function openInvitation() {
         document.getElementById('cover').classList.add('opened');
         document.body.classList.remove('no-scroll');
         document.getElementById('music-btn').classList.add('visible');
         document.getElementById('nav-bottom').classList.add('visible');
-        // Auto play music
         audio.play().then(() => {
             musicPlaying = true;
             document.getElementById('music-btn').classList.add('playing');
         }).catch(() => {});
-        // Remove cover from DOM after animation
-        setTimeout(() => {
-            document.getElementById('cover').style.display = 'none';
-        }, 900);
+        setTimeout(() => { document.getElementById('cover').style.display = 'none'; }, 900);
     }
-
+    
     function toggleMusic() {
         if (musicPlaying) {
-            audio.pause();
-            musicPlaying = false;
+            audio.pause(); musicPlaying = false;
             document.getElementById('music-btn').classList.remove('playing');
         } else {
-            audio.play();
-            musicPlaying = true;
+            audio.play(); musicPlaying = true;
             document.getElementById('music-btn').classList.add('playing');
         }
     }
-
+    
     // ===========================
     // COUNTDOWN
     // ===========================
     function updateCountdown() {
-        const target = new Date(CONFIG.weddingDate).getTime();
-        const now = new Date().getTime();
-        const diff = target - now;
+        const diff = new Date(CONFIG.weddingDate).getTime() - Date.now();
         if (diff <= 0) {
-            document.getElementById('cd-days').textContent = '00';
-            document.getElementById('cd-hours').textContent = '00';
-            document.getElementById('cd-minutes').textContent = '00';
-            document.getElementById('cd-seconds').textContent = '00';
+            ['cd-days','cd-hours','cd-minutes','cd-seconds'].forEach(id => document.getElementById(id).textContent = '00');
             return;
         }
-        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((diff % (1000 * 60)) / 1000);
-        document.getElementById('cd-days').textContent = String(d).padStart(2, '0');
-        document.getElementById('cd-hours').textContent = String(h).padStart(2, '0');
-        document.getElementById('cd-minutes').textContent = String(m).padStart(2, '0');
-        document.getElementById('cd-seconds').textContent = String(s).padStart(2, '0');
+        document.getElementById('cd-days').textContent = String(Math.floor(diff / 86400000)).padStart(2, '0');
+        document.getElementById('cd-hours').textContent = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
+        document.getElementById('cd-minutes').textContent = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+        document.getElementById('cd-seconds').textContent = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
     }
     updateCountdown();
     setInterval(updateCountdown, 1000);
-
+    
     // ===========================
     // LIGHTBOX
     // ===========================
     function openLightbox(el) {
-        const src = el.querySelector('img').src;
-        document.getElementById('lightbox-img').src = src;
+        document.getElementById('lightbox-img').src = el.querySelector('img').src;
         document.getElementById('lightbox').classList.add('active');
     }
-    function closeLightbox() {
-        document.getElementById('lightbox').classList.remove('active');
+    function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
+    
+    // ===========================
+    // FIX #3: Helper API — SELALU panggil, tidak ada lagi pengecekan URL
+    // ===========================
+    async function apiGet(action) {
+        try {
+            const url = CONFIG.apiBase + '?action=' + action;
+            console.log('[API GET]', url);
+            const res = await fetch(url);
+            const data = await res.json();
+            console.log('[API GET response]', action, data);
+            return data;
+        } catch (err) {
+            console.error('[API GET error]', action, err);
+            return null;
+        }
     }
-
+    
+    async function apiPost(data) {
+        try {
+            console.log('[API POST]', data);
+            // PENTING: Pakai mode 'no-cors' + Content-Type 'text/plain'
+            // Ini cara yang benar untuk POST ke Google Apps Script dari browser
+            // Data tetap terkirim meskipun response "opaque" (tidak bisa dibaca)
+            await fetch(CONFIG.apiBase, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(data)
+            });
+            console.log('[API POST] sent successfully');
+            return true;
+        } catch (err) {
+            console.error('[API POST error]', err);
+            return false;
+        }
+    }
+    
     // ===========================
     // RSVP
     // ===========================
     let selectedAttend = 'Hadir';
-
+    
     function selectAttend(el, value) {
         document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
         el.classList.add('selected');
         selectedAttend = value;
         document.getElementById('rsvp-attend').value = value;
     }
-
+    
     async function submitRSVP(e) {
         e.preventDefault();
         const btn = document.getElementById('rsvp-btn');
         const msg = document.getElementById('rsvp-msg');
         const name = document.getElementById('rsvp-name').value.trim();
         const jumlah = document.getElementById('rsvp-jumlah').value;
-
         if (!name) { msg.textContent = 'Mohon isi nama'; return; }
-
+    
         btn.disabled = true; btn.textContent = 'Mengirim...';
-
-        try {
-            if (CONFIG.apiRsvp !== 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec') {
-                await fetch(CONFIG.apiRsvp, {
-                    method: 'POST', mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, attend: selectedAttend, jumlah, date: new Date().toLocaleString('id-ID') })
-                });
-            }
-            msg.textContent = 'Terima kasih atas konfirmasinya!';
-            msg.style.color = '#C9A96E';
-        } catch {
-            msg.textContent = 'Terjadi kesalahan, coba lagi';
-        }
+    
+        await apiPost({
+            action: 'rsvp',
+            name: name,
+            attend: selectedAttend,
+            jumlah: jumlah,
+            date: new Date().toLocaleString('id-ID')
+        });
+    
+        msg.textContent = 'Terima kasih atas konfirmasinya!';
+        msg.style.color = '#C9A96E';
         btn.disabled = false; btn.textContent = 'Kirim Konfirmasi';
     }
-
+    
     // ===========================
     // WISHES
     // ===========================
     async function loadWishes() {
         const list = document.getElementById('wishes-list');
-        if (CONFIG.apiWishes === 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec') {
+        const data = await apiGet('wishes');
+    
+        if (data && data.wishes && data.wishes.length) {
+            list.innerHTML = data.wishes.reverse().map(w => `
+                <div class="wish-item">
+                    <p class="wish-author">${escapeHtml(w.name)}</p>
+                    <p class="wish-text">${escapeHtml(w.message)}</p>
+                    <p class="wish-time">${w.date || ''}</p>
+                </div>
+            `).join('');
+        } else {
             list.innerHTML = '<p style="text-align:center;font-size:0.85rem;color:var(--charcoal-light);">Belum ada ucapan. Jadilah yang pertama!</p>';
-            return;
         }
-        try {
-            const res = await fetch(CONFIG.apiWishes);
-            const data = await res.json();
-            if (data.wishes && data.wishes.length) {
-                list.innerHTML = data.wishes.reverse().map(w => `
-                    <div class="wish-item">
-                        <p class="wish-author">${escapeHtml(w.name)}</p>
-                        <p class="wish-text">${escapeHtml(w.message)}</p>
-                        <p class="wish-time">${w.date || ''}</p>
-                    </div>
-                `).join('');
-            }
-        } catch {}
     }
-
+    
     async function submitWish() {
         const btn = document.getElementById('wish-btn');
         const name = document.getElementById('wish-name').value.trim();
         const text = document.getElementById('wish-text').value.trim();
-
         if (!name || !text) { showToast('Mohon isi nama dan ucapan'); return; }
-
+    
         btn.disabled = true; btn.textContent = 'Mengirim...';
-
-        try {
-            if (CONFIG.apiWishes !== 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec') {
-                await fetch(CONFIG.apiWishes, {
-                    method: 'POST', mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, message: text, date: new Date().toLocaleString('id-ID') })
-                });
-            }
-            // Add locally
-            const list = document.getElementById('wishes-list');
-            const noWish = list.querySelector('p');
-            if (noWish && !noWish.classList.contains('wish-item')) noWish.remove();
-            list.insertAdjacentHTML('afterbegin', `
-                <div class="wish-item">
-                    <p class="wish-author">${escapeHtml(name)}</p>
-                    <p class="wish-text">${escapeHtml(text)}</p>
-                    <p class="wish-time">Baru saja</p>
-                </div>
-            `);
-            document.getElementById('wish-text').value = '';
-            showToast('Ucapan terkirim! Terima kasih');
-        } catch {
-            showToast('Gagal mengirim, coba lagi');
-        }
+    
+        await apiPost({
+            action: 'wish',
+            name: name,
+            message: text,
+            date: new Date().toLocaleString('id-ID')
+        });
+    
+        // Tambah ke UI langsung
+        const list = document.getElementById('wishes-list');
+        const firstChild = list.firstElementChild;
+        if (firstChild && !firstChild.classList.contains('wish-item')) firstChild.remove();
+    
+        list.insertAdjacentHTML('afterbegin', `
+            <div class="wish-item">
+                <p class="wish-author">${escapeHtml(name)}</p>
+                <p class="wish-text">${escapeHtml(text)}</p>
+                <p class="wish-time">Baru saja</p>
+            </div>
+        `);
+        document.getElementById('wish-text').value = '';
+        showToast('Ucapan terkirim! Terima kasih');
         btn.disabled = false; btn.textContent = 'Kirim Ucapan';
     }
-
+    
     // ===========================
     // GIFT REGISTRY
     // ===========================
     async function loadGifts() {
         const grid = document.getElementById('gift-grid');
-        let gifts = CONFIG.defaultGifts;
-
-        if (CONFIG.apiGifts !== 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec') {
-            try {
-                const res = await fetch(CONFIG.apiGifts);
-                const data = await res.json();
-                if (data.gifts) gifts = data.gifts;
-            } catch {}
+        let gifts = CONFIG.defaultGifts; // Fallback
+    
+        // Coba ambil dari Google Sheets
+        const data = await apiGet('gifts');
+        if (data && data.gifts && data.gifts.length) {
+            gifts = data.gifts;
         }
-
-        grid.innerHTML = gifts.map(g => `
-            <div class="gift-card ${g.status === 'claimed' ? 'claimed' : ''}" data-id="${g.id}">
-                <img class="gift-img" src="${g.gambar}" alt="${g.nama}" onerror="this.style.background='var(--cream-dark)'">
-                <div class="gift-info">
-                    <p class="gift-name">${escapeHtml(g.nama)}</p>
-                    <p class="gift-price">${g.harga}</p>
-                    <button class="btn-claim" onclick="claimGift(${g.id}, '${escapeHtml(g.nama)}')">Klaim Hadiah</button>
-                    <p class="claimed-badge">Sudah diklaim ${g.diklaim_oleh ? 'oleh ' + escapeHtml(g.diklaim_oleh) : ''}</p>
+    
+        if (!gifts || !gifts.length) {
+            grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--charcoal-light);">Belum ada daftar hadiah</p>';
+            return;
+        }
+    
+        grid.innerHTML = gifts.map(g => {
+            const isClaimed = String(g.status || '').toLowerCase() === 'claimed';
+            const safeNama = escapeHtml(g.nama || '');
+            return `
+                <div class="gift-card ${isClaimed ? 'claimed' : ''}" data-id="${g.id}">
+                    ${g.gambar ? `<img class="gift-img" src="${g.gambar}" alt="${safeNama}" onerror="this.style.display='none'">` : '<div class="gift-img" style="display:flex;align-items:center;justify-content:center;color:var(--sage);font-size:2rem;">🎁</div>'}
+                    <div class="gift-info">
+                        <p class="gift-name">${safeNama}</p>
+                        <p class="gift-price">${escapeHtml(String(g.harga || ''))}</p>
+                        <button class="btn-claim" onclick="claimGift(${g.id}, '${safeNama.replace(/'/g, "\\'")}')">Klaim Hadiah</button>
+                        <p class="claimed-badge">Sudah diklaim${g.diklaim_oleh ? ' oleh ' + escapeHtml(g.diklaim_oleh) : ''}</p>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
-
+    
     async function claimGift(id, nama) {
         const guest = guestName ? decodeURIComponent(guestName.replace(/\+/g, ' ')) : prompt('Masukkan nama Anda:');
         if (!guest) return;
-
-        if (!confirm(`Klaim "${nama}" sebagai hadiah dari ${guest}?`)) return;
-
-        try {
-            if (CONFIG.apiGifts !== 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec') {
-                await fetch(CONFIG.apiGifts, {
-                    method: 'POST', mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, nama_tamu: guest })
-                });
-            }
-            // Update UI
-            const card = document.querySelector(`.gift-card[data-id="${id}"]`);
-            if (card) {
-                card.classList.add('claimed');
-                const badge = card.querySelector('.claimed-badge');
-                badge.textContent = `Diklaim oleh ${guest}`;
-            }
-            showToast(`Terima kasih ${guest}! Hadiah berhasil diklaim.`);
-        } catch {
-            showToast('Gagal mengklaim, coba lagi');
+        if (!confirm('Klaim "' + nama + '" sebagai hadiah dari ' + guest + '?')) return;
+    
+        await apiPost({
+            action: 'claim_gift',
+            id: id,
+            nama_tamu: guest
+        });
+    
+        // Update UI
+        const card = document.querySelector('.gift-card[data-id="' + id + '"]');
+        if (card) {
+            card.classList.add('claimed');
+            const badge = card.querySelector('.claimed-badge');
+            if (badge) badge.textContent = 'Diklaim oleh ' + guest;
         }
+        showToast('Terima kasih ' + guest + '! Hadiah berhasil diklaim.');
     }
-
+    
     // ===========================
     // PLAYLIST
     // ===========================
     async function loadPlaylist() {
         const list = document.getElementById('playlist-list');
-        if (CONFIG.apiPlaylist === 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec') {
-            list.innerHTML = '<p style="text-align:center;font-size:0.85rem;opacity:0.5;">Belum ada request lagu</p>';
-            return;
-        }
-        try {
-            const res = await fetch(CONFIG.apiPlaylist);
-            const data = await res.json();
-            if (data.songs && data.songs.length) {
-                list.innerHTML = data.songs.reverse().map(s => `
-                    <div class="playlist-item">
-                        <span class="playlist-icon">♪</span>
-                        <div>
-                            <p class="playlist-song">${escapeHtml(s.song)}</p>
-                            <p class="playlist-requester">oleh ${escapeHtml(s.name)}</p>
-                        </div>
+        const data = await apiGet('playlist');
+    
+        if (data && data.songs && data.songs.length) {
+            list.innerHTML = data.songs.reverse().map(s => `
+                <div class="playlist-item">
+                    <span class="playlist-icon">♪</span>
+                    <div>
+                        <p class="playlist-song">${escapeHtml(s.song)}</p>
+                        <p class="playlist-requester">oleh ${escapeHtml(s.name)}</p>
                     </div>
-                `).join('');
-            }
-        } catch {}
+                </div>
+            `).join('');
+        } else {
+            list.innerHTML = '<p style="text-align:center;font-size:0.85rem;opacity:0.5;">Belum ada request lagu</p>';
+        }
     }
-
+    
     async function submitPlaylist() {
         const btn = document.getElementById('pl-btn');
         const msg = document.getElementById('pl-msg');
         const name = document.getElementById('pl-name').value.trim();
         const song = document.getElementById('pl-song').value.trim();
-
         if (!name || !song) { msg.textContent = 'Mohon isi nama dan judul lagu'; return; }
-
+    
         btn.disabled = true; btn.textContent = 'Mengirim...';
-
-        try {
-            if (CONFIG.apiPlaylist !== 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec') {
-                await fetch(CONFIG.apiPlaylist, {
-                    method: 'POST', mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, song, date: new Date().toLocaleString('id-ID') })
-                });
-            }
-            // Add locally
-            const list = document.getElementById('playlist-list');
-            const noSong = list.querySelector('p');
-            if (noSong && !noSong.classList.contains('playlist-item')) noSong.remove();
-            list.insertAdjacentHTML('afterbegin', `
-                <div class="playlist-item">
-                    <span class="playlist-icon">♪</span>
-                    <div>
-                        <p class="playlist-song">${escapeHtml(song)}</p>
-                        <p class="playlist-requester">oleh ${escapeHtml(name)}</p>
-                    </div>
+    
+        await apiPost({
+            action: 'playlist',
+            name: name,
+            song: song,
+            date: new Date().toLocaleString('id-ID')
+        });
+    
+        const list = document.getElementById('playlist-list');
+        const firstChild = list.firstElementChild;
+        if (firstChild && !firstChild.classList.contains('playlist-item')) firstChild.remove();
+    
+        list.insertAdjacentHTML('afterbegin', `
+            <div class="playlist-item">
+                <span class="playlist-icon">♪</span>
+                <div>
+                    <p class="playlist-song">${escapeHtml(song)}</p>
+                    <p class="playlist-requester">oleh ${escapeHtml(name)}</p>
                 </div>
-            `);
-            document.getElementById('pl-song').value = '';
-            msg.textContent = 'Lagu berhasil di-request!';
-            msg.style.color = '#C9A96E';
-            setTimeout(() => msg.textContent = '', 3000);
-        } catch {
-            msg.textContent = 'Gagal mengirim, coba lagi';
-        }
+            </div>
+        `);
+        document.getElementById('pl-song').value = '';
+        msg.textContent = 'Lagu berhasil di-request!';
+        msg.style.color = '#C9A96E';
+        setTimeout(() => msg.textContent = '', 3000);
         btn.disabled = false; btn.textContent = 'Request Lagu';
     }
-
+    
     // ===========================
     // UTILITIES
     // ===========================
@@ -1392,21 +1388,21 @@
             showToast('Nomor rekening disalin!');
         });
     }
-
+    
     function showToast(msg) {
         const toast = document.getElementById('toast');
         toast.textContent = msg;
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 2500);
     }
-
+    
     function escapeHtml(str) {
         if (!str) return '';
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
     }
-
+    
     // ===========================
     // LOAD DATA ON PAGE READY
     // ===========================
