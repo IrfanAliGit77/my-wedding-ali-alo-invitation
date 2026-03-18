@@ -1331,52 +1331,59 @@
         if (!guest) return;
 
         if (link) {
-            // Tanya dulu sebelum pindah tab agar user paham alurnya
             const goToko = confirm('Kamu akan diarahkan ke toko online.\n\nJANGAN LUPA KEMBALI KE SINI untuk konfirmasi setelah selesai membeli ya!\n\nLanjutkan buka toko?');
             if (!goToko) return;
             
+            // Buka Shopee / Toko di tab baru
             window.open(link, '_blank');
             
-            // Mendeteksi kapan user kembali ke tab undangan ini
-            window.addEventListener('focus', function onFocusHandler() {
-                // Hapus event listener agar tidak ter-trigger berulang-ulang
-                window.removeEventListener('focus', onFocusHandler); 
-                
-                // Kasih jeda sedikit (500ms) agar pop-up tidak muncul terlalu mengagetkan
-                setTimeout(async () => {
-                    const confirmed = confirm(
-                        'Selamat datang kembali!\n\n' +
-                        'Apakah kamu sudah selesai checkout / membeli "' + nama + '"?\n\n' +
-                        'Klik OK agar hadiah ini ditandai sebagai pemberianmu.'
-                    );
+            // Gunakan visibilitychange (Jauh lebih stabil dari focus)
+            const handleVisibilityChange = () => {
+                // Mengecek apakah user sudah kembali melihat halaman ini
+                if (document.visibilityState === 'visible') {
+                    // Copot listenernya biar nggak muncul terus-terusan
+                    document.removeEventListener('visibilitychange', handleVisibilityChange);
                     
-                    if (!confirmed) {
-                        showToast('Tidak apa-apa, kamu bisa klaim nanti!');
-                        return;
-                    }
-                    
-                    // Lanjut klaim ke sheet & UI
-                    await prosesKlaim(id, guest);
-                }, 500);
-            });
+                    // Kasih jeda setengah detik biar browser nafas dulu
+                    setTimeout(async () => {
+                        const confirmed = confirm(
+                            'Selamat datang kembali!\n\n' +
+                            'Apakah kamu sudah selesai checkout / membeli "' + nama + '"?\n\n' +
+                            'Klik OK agar hadiah ini ditandai sebagai pemberianmu.'
+                        );
+                        
+                        if (!confirmed) {
+                            showToast('Tidak apa-apa, kamu bisa klaim nanti!');
+                            return;
+                        }
+                        
+                        await prosesKlaim(id, guest);
+                    }, 500);
+                }
+            };
+
+            // Pasang pendeteksi perpindahan tab
+            document.addEventListener('visibilitychange', handleVisibilityChange);
             
         } else {
-            // Kalau tidak ada link, langsung tanya seperti biasa
+            // Kalau tidak ada link toko, langsung tanya biasa
             if (!confirm('Klaim "' + nama + '" sebagai hadiah dari ' + guest + '?')) return;
             await prosesKlaim(id, guest);
         }
     }
 
-    // Fungsi tambahan untuk memisahkan logika agar lebih rapi
     async function prosesKlaim(id, guest) {
-        // Mark as claimed di database (Google Sheets)
+        // Tampilkan loading di tombol (opsional biar ada feedback)
+        showToast('Memproses klaim...');
+
+        // Tembak ke Apps Script
         await apiPost({
             action: 'claim_gift',
             id: id,
             nama_tamu: guest
         });
 
-        // Update UI — membuat card jadi blur
+        // Update UI langsung blur
         const card = document.querySelector('.gift-card[data-id="' + id + '"]');
         if (card) {
             card.classList.add('claimed');
@@ -1384,7 +1391,7 @@
             if (badge) badge.textContent = 'Diklaim oleh ' + guest;
         }
         showToast('Terima kasih ' + guest + '! Hadiah berhasil diklaim.');
-    }
+    } 
 // ===========================
     // PLAYLIST
     // ===========================
