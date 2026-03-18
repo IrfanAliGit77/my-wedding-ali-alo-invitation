@@ -275,10 +275,24 @@
         }
 
         @media (max-width: 640px) {
-            .timeline::before { left: 1rem; }
-            .timeline-item, .timeline-item:nth-child(even) { flex-direction: row; }
-            .timeline-content { width: calc(100% - 3rem); margin-left: 2.5rem; }
-            .timeline-dot { left: 1rem; }
+            .cover-inner .couple-name { font-size: 2.2rem; }
+            .section-title { font-size: 2rem; }
+            .quran-ayat { font-size: 1.4rem; }
+            .mempelai-grid { gap: 1.5rem; flex-direction: column; align-items: center; }
+            .mempelai-card { min-width: unset; max-width: 280px; width: 100%; }
+            .mempelai-photo { width: 160px; height: 160px; }
+            .mempelai-ampersand { font-size: 2.5rem; }
+            .mempelai-name { font-size: 1.6rem; }
+            section { padding: 4rem 1.2rem; }
+            .countdown-grid { gap: 0.8rem; }
+            .countdown-item { min-width: 70px; padding: 1rem 0.8rem; }
+            .countdown-number { font-size: 2.2rem; }
+            .rekening-grid { flex-direction: column; align-items: center; }
+            .rekening-card { min-width: unset; max-width: 100%; width: 100%; }
+            .gift-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+            .radio-group { flex-direction: column; gap: 0.5rem; }
+            .venue-name { font-size: 1.3rem; }
+            .nav-links a { font-size: 0.55rem; }
         }
 
         /* ============ GALLERY ============ */
@@ -681,7 +695,7 @@
 <body class="no-scroll">
     <!-- ============ AUDIO ============ -->
     <audio id="bg-music" loop preload="auto">
-        <source src="assets\music\sound-kita.mp3" type="audio/mpeg">
+        <source src="assets/music/sound-kita.mp3" type="audio/mpeg">
     </audio>
 
     <!-- ============ COVER ============ -->
@@ -748,7 +762,7 @@
             <div class="mempelai-grid">
                 <div class="mempelai-card" data-aos="fade-right" data-aos-delay="200">
                     <!-- GANTI: foto mempelai pria -->
-                    <img class="mempelai-photo" src="assets\images\irfan.jpeg" alt="Mempelai Pria">
+                    <img class="mempelai-photo" src="assets/images/irfan.jpeg" alt="Mempelai Pria">
                     <p class="mempelai-name">Ali</p>
                     <p class="mempelai-fullname">Muh. Irfan Ali</p>
                     <p class="mempelai-parent">Putra dari<br>Bapak Tekat & Almh.Ibu Nur Hasanah</p>
@@ -756,7 +770,7 @@
                 <p class="mempelai-ampersand" data-aos="zoom-in" data-aos-delay="300">&amp;</p>
                 <div class="mempelai-card" data-aos="fade-left" data-aos-delay="200">
                     <!-- GANTI: foto mempelai wanita -->
-                    <img class="mempelai-photo" src="assets\images\alo2.jpeg" alt="Mempelai Wanita">
+                    <img class="mempelai-photo" src="assets/images/alo2.jpeg" alt="Mempelai Wanita">
                     <p class="mempelai-name">Alo</p>
                     <p class="mempelai-fullname">Alodia Kinanti Faruqa</p>
                     <p class="mempelai-parent">Putri dari<br>Bapak Imam Rohani & Ibu Nikmatim Bariroh</p>
@@ -856,22 +870,22 @@
             <!-- GANTI: foto-foto prewed -->
             <div class="gallery-grid" data-aos="fade-up" data-aos-delay="200">
                 <div class="gallery-item" onclick="openLightbox(this)">
-                    <img src="assets\images\1.jpeg" alt="Prewed 1">
+                    <img src="assets/images/1.jpeg" alt="Prewed 1">
                 </div>
                 <div class="gallery-item" onclick="openLightbox(this)">
-                    <img src="assets\images\2.jpeg" alt="Prewed 2">
+                    <img src="assets/images/2.jpeg" alt="Prewed 2">
                 </div>
                 <div class="gallery-item" onclick="openLightbox(this)">
-                    <img src="assets\images\3.jpeg" alt="Prewed 3">
+                    <img src="assets/images/3.jpeg" alt="Prewed 3">
                 </div>
                 <div class="gallery-item" onclick="openLightbox(this)">
-                    <img src="assets\images\4.jpeg" alt="Prewed 4">
+                    <img src="assets/images/4.jpeg" alt="Prewed 4">
                 </div>
                 <div class="gallery-item" onclick="openLightbox(this)">
-                    <img src="assets\images\5.jpeg" alt="Prewed 5">
+                    <img src="assets/images/5.jpeg" alt="Prewed 5">
                 </div>
                 <div class="gallery-item" onclick="openLightbox(this)">
-                    <img src="assets\images\6.jpeg" alt="Prewed 6">
+                    <img src="assets/images/6.jpeg" alt="Prewed 6">
                 </div>
             </div>
         </div>
@@ -1073,14 +1087,14 @@
     weddingDate: '2026-12-25T09:00:00',
  
     // FIX #1: Satu base URL saja, action ditambahkan otomatis
-    apiBase: 'https://script.google.com/macros/s/AKfycbxZgIau2SQaiKR91aG7AxUCJekcE_7Y2wI5YPPVJ8khrYefIVN0kFEsc3PZ7SjDaT8/exec',
+    apiBase: 'https://script.google.com/macros/s/AKfycbw6HGoWadyq1PcnVp6Lz6cc4tdBxyfEnxCYlFgPVFiJrLAiGFOoUEP9jFBlrLf68Ebu/exec',
  
     // FIX #2: Default gifts sebagai fallback
     defaultGifts: [
-        { id: 1, nama: 'Jasjus', gambar: '', harga: 'Rp. 400.000', status: 'available', diklaim_oleh: '' },
-        { id: 2, nama: 'Jus Buah', gambar: '', harga: 'Rp. 600.000', status: 'available', diklaim_oleh: '' },
-        { id: 3, nama: 'Makarel', gambar: '', harga: 'Rp. 800.000', status: 'available', diklaim_oleh: '' },
-        ]
+        { id: 1, nama: 'Jasjus', gambar: '', harga: 'Rp. 400.000', status: 'available', diklaim_oleh: '', link: 'https://tokopedia.com/link-jasjus' },
+        { id: 2, nama: 'Jus Buah', gambar: '', harga: 'Rp. 600.000', status: 'available', diklaim_oleh: '', link: 'https://tokopedia.com/link-jus-buah' },
+        { id: 3, nama: 'Makarel', gambar: '', harga: 'Rp. 800.000', status: 'available', diklaim_oleh: '', link: 'https://tokopedia.com/link-makarel' },
+    ]
     };
     
     // ===========================
@@ -1282,48 +1296,66 @@
     // ===========================
     async function loadGifts() {
         const grid = document.getElementById('gift-grid');
-        let gifts = CONFIG.defaultGifts; // Fallback
-    
-        // Coba ambil dari Google Sheets
+        let gifts = CONFIG.defaultGifts;
+
         const data = await apiGet('gifts');
         if (data && data.gifts && data.gifts.length) {
             gifts = data.gifts;
         }
-    
+
         if (!gifts || !gifts.length) {
             grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--charcoal-light);">Belum ada daftar hadiah</p>';
             return;
         }
-    
+
         grid.innerHTML = gifts.map(g => {
             const isClaimed = String(g.status || '').toLowerCase() === 'claimed';
             const safeNama = escapeHtml(g.nama || '');
+            const safeLink = g.link || '';
             return `
                 <div class="gift-card ${isClaimed ? 'claimed' : ''}" data-id="${g.id}">
                     ${g.gambar ? `<img class="gift-img" src="${g.gambar}" alt="${safeNama}" onerror="this.style.display='none'">` : '<div class="gift-img" style="display:flex;align-items:center;justify-content:center;color:var(--sage);font-size:2rem;">🎁</div>'}
                     <div class="gift-info">
                         <p class="gift-name">${safeNama}</p>
                         <p class="gift-price">${escapeHtml(String(g.harga || ''))}</p>
-                        <button class="btn-claim" onclick="claimGift(${g.id}, '${safeNama.replace(/'/g, "\\'")}')">Berikan Hadiah</button>
+                        <button class="btn-claim" onclick="claimGift(${g.id}, '${safeNama.replace(/'/g, "\\'")}', '${safeLink.replace(/'/g, "\\'")}')">Berikan Hadiah</button>
                         <p class="claimed-badge">Sudah diklaim${g.diklaim_oleh ? ' oleh ' + escapeHtml(g.diklaim_oleh) : ''}</p>
                     </div>
                 </div>
             `;
         }).join('');
     }
-    
-    async function claimGift(id, nama) {
+
+    async function claimGift(id, nama, link) {
         const guest = guestName ? decodeURIComponent(guestName.replace(/\+/g, ' ')) : prompt('Masukkan nama Anda:');
         if (!guest) return;
-        if (!confirm('Klaim "' + nama + '" sebagai hadiah dari ' + guest + '?')) return;
-    
+
+        // Step 1: Buka link e-commerce kalau ada
+        if (link) {
+            window.open(link, '_blank');
+            // Step 2: Tunggu, lalu tanya apakah sudah checkout
+            const confirmed = confirm(
+                'Link toko sudah dibuka di tab baru.\n\n' +
+                'Apakah kamu sudah selesai checkout / membeli "' + nama + '"?\n\n' +
+                'Klik OK kalau sudah beli, atau Cancel kalau belum jadi.'
+            );
+            if (!confirmed) {
+                showToast('Tidak apa-apa, kamu bisa klaim nanti!');
+                return;
+            }
+        } else {
+            // Kalau tidak ada link, langsung confirm
+            if (!confirm('Klaim "' + nama + '" sebagai hadiah dari ' + guest + '?')) return;
+        }
+
+        // Step 3: Mark as claimed di Google Sheets
         await apiPost({
             action: 'claim_gift',
             id: id,
             nama_tamu: guest
         });
-    
-        // Update UI
+
+        // Step 4: Update UI — blur card
         const card = document.querySelector('.gift-card[data-id="' + id + '"]');
         if (card) {
             card.classList.add('claimed');
@@ -1332,8 +1364,8 @@
         }
         showToast('Terima kasih ' + guest + '! Hadiah berhasil diklaim.');
     }
-    
-    // ===========================
+        
+// ===========================
     // PLAYLIST
     // ===========================
     async function loadPlaylist() {
