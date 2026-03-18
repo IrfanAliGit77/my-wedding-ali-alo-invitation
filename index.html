@@ -1330,32 +1330,53 @@
         const guest = guestName ? decodeURIComponent(guestName.replace(/\+/g, ' ')) : prompt('Masukkan nama Anda:');
         if (!guest) return;
 
-        // Step 1: Buka link e-commerce kalau ada
         if (link) {
+            // Tanya dulu sebelum pindah tab agar user paham alurnya
+            const goToko = confirm('Kamu akan diarahkan ke toko online.\n\nJANGAN LUPA KEMBALI KE SINI untuk konfirmasi setelah selesai membeli ya!\n\nLanjutkan buka toko?');
+            if (!goToko) return;
+            
             window.open(link, '_blank');
-            // Step 2: Tunggu, lalu tanya apakah sudah checkout
-            const confirmed = confirm(
-                'Link toko sudah dibuka di tab baru.\n\n' +
-                'Apakah kamu sudah selesai checkout / membeli "' + nama + '"?\n\n' +
-                'Klik OK kalau sudah beli, atau Cancel kalau belum jadi.'
-            );
-            if (!confirmed) {
-                showToast('Tidak apa-apa, kamu bisa klaim nanti!');
-                return;
-            }
+            
+            // Mendeteksi kapan user kembali ke tab undangan ini
+            window.addEventListener('focus', function onFocusHandler() {
+                // Hapus event listener agar tidak ter-trigger berulang-ulang
+                window.removeEventListener('focus', onFocusHandler); 
+                
+                // Kasih jeda sedikit (500ms) agar pop-up tidak muncul terlalu mengagetkan
+                setTimeout(async () => {
+                    const confirmed = confirm(
+                        'Selamat datang kembali!\n\n' +
+                        'Apakah kamu sudah selesai checkout / membeli "' + nama + '"?\n\n' +
+                        'Klik OK agar hadiah ini ditandai sebagai pemberianmu.'
+                    );
+                    
+                    if (!confirmed) {
+                        showToast('Tidak apa-apa, kamu bisa klaim nanti!');
+                        return;
+                    }
+                    
+                    // Lanjut klaim ke sheet & UI
+                    await prosesKlaim(id, guest);
+                }, 500);
+            });
+            
         } else {
-            // Kalau tidak ada link, langsung confirm
+            // Kalau tidak ada link, langsung tanya seperti biasa
             if (!confirm('Klaim "' + nama + '" sebagai hadiah dari ' + guest + '?')) return;
+            await prosesKlaim(id, guest);
         }
+    }
 
-        // Step 3: Mark as claimed di Google Sheets
+    // Fungsi tambahan untuk memisahkan logika agar lebih rapi
+    async function prosesKlaim(id, guest) {
+        // Mark as claimed di database (Google Sheets)
         await apiPost({
             action: 'claim_gift',
             id: id,
             nama_tamu: guest
         });
 
-        // Step 4: Update UI — blur card
+        // Update UI — membuat card jadi blur
         const card = document.querySelector('.gift-card[data-id="' + id + '"]');
         if (card) {
             card.classList.add('claimed');
@@ -1364,7 +1385,6 @@
         }
         showToast('Terima kasih ' + guest + '! Hadiah berhasil diklaim.');
     }
-        
 // ===========================
     // PLAYLIST
     // ===========================
