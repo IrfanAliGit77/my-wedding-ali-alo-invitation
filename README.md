@@ -12,7 +12,7 @@
 
 This is a **fully self-hosted, open-source** digital wedding invitation website for the marriage of **Muh. Irfan Ali** and **Alodia Kinanti Faruqa** on **December 25, 2026** at **Bukit Daun Hotel & Resort, Kediri, East Java, Indonesia**.
 
-Every guest receives a **personalized link** (e.g., `?to=John+Doe`) — their name appears on the cover, RSVP form, wishes form, and playlist request, just like premium invitation platforms like undangankitaaja.com — but **completely free**.
+Every guest receives a **personalized link** (e.g., `?to=Yanah+Ma'rifa`) — their name appears on the cover, RSVP form, wishes form, and playlist request, just like premium invitation platforms like undangankitaaja.com — but **completely free**.
 
 The backend runs entirely on **Google Sheets + Google Apps Script** — no server, no database fees, no monthly subscriptions. Just deploy to GitHub Pages and you're done.
 
